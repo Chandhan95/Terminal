@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Terminal - Web Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .terminal-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        .terminal-header {
+            background: #333;
+            padding: 10px 15px;
+            border-radius: 5px 5px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .terminal-title {
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .close { background: #ff5f56; }
+        .minimize { background: #ffbd2e; }
+        .maximize { background: #27ca3f; }
+        
+        .terminal-output {
+            flex: 1;
+            background: #000;
+            padding: 15px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .terminal-input-container {
+            background: #000;
+            padding: 15px;
+            border-top: 1px solid #333;
+            display: flex;
+            align-items: center;
+        }
+        
+        .terminal-prompt {
+            color: #00ff00;
+            margin-right: 10px;
+            min-width: fit-content;
+        }
+        
+        .terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .command-line {
+            margin-bottom: 5px;
+        }
+        
+        .command-prompt {
+            color: #00ff00;
+        }
+        
+        .command-text {
+            color: #fff;
+        }
+        
+        .output-text {
+            color: #00ff00;
+        }
+        
+        .error-text {
+            color: #ff6b6b;
+        }
+        
+        .system-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            max-width: 200px;
+            display: none;
+        }
+        
+        .toggle-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .loading {
+            opacity: 0.7;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .cursor {
+            animation: blink 1s infinite;
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-title">Python Terminal v1.0</div>
+            <div class="terminal-controls">
+                <div class="control-btn close" onclick="closeTerminal()"></div>
+                <div class="control-btn minimize" onclick="minimizeTerminal()"></div>
+                <div class="control-btn maximize" onclick="maximizeTerminal()"></div>
+            </div>
+        </div>
+        
+        <div class="terminal-output" id="output">
+            <div class="command-line">
+                <span class="output-text">Python Terminal v1.0 - Web Interface</span>
+            </div>
+            <div class="command-line">
+                <span class="output-text">Type 'help' for available commands</span>
+            </div>
+            <div class="command-line">
+                <span class="output-text">Type 'ai_help' for natural language command examples</span>
+            </div>
+            <div class="command-line">
+                <span class="output-text">====================================</span>
+            </div>
+        </div>
+        
+        <div class="terminal-input-container">
+            <span class="terminal-prompt" id="prompt">user@localhost:~$ </span>
+            <input type="text" class="terminal-input" id="input" autocomplete="off" spellcheck="false">
+            <span class="cursor">|</span>
+        </div>
+    </div>
+    
+    <button class="toggle-info" onclick="toggleSystemInfo()">System Info</button>
+    
+    <div class="system-info" id="systemInfo">
+        <div id="systemInfoContent">Loading...</div>
+    </div>
+
+    <script>
+        class WebTerminal {
+            constructor() {
+                this.output = document.getElementById('output');
+                this.input = document.getElementById('input');
+                this.prompt = document.getElementById('prompt');
+                this.commandHistory = [];
+                this.historyIndex = -1;
+                
+                this.setupEventListeners();
+                this.loadSystemInfo();
+                this.focusInput();
+            }
+            
+            setupEventListeners() {
+                this.input.addEventListener('keydown', (e) => this.handleKeyDown(e));
+                this.input.addEventListener('keyup', (e) => this.handleKeyUp(e));
+                
+                // Focus input when clicking anywhere in terminal
+                document.addEventListener('click', () => this.focusInput());
+            }
+            
+            handleKeyDown(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    this.executeCommand();
+                } else if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    this.navigateHistory('up');
+                } else if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    this.navigateHistory('down');
+                } else if (event.key === 'Tab') {
+                    event.preventDefault();
+                    // TODO: Implement tab completion
+                } else if (event.ctrlKey && event.key === 'l') {
+                    event.preventDefault();
+                    this.clearScreen();
+                } else if (event.ctrlKey && event.key === 'c') {
+                    event.preventDefault();
+                    this.interruptCommand();
+                }
+            }
+            
+            handleKeyUp(event) {
+                // Handle any key up events if needed
+            }
+            
+            async executeCommand() {
+                const command = this.input.value.trim();
+                
+                if (!command) return;
+                
+                // Add command to history
+                this.commandHistory.unshift(command);
+                this.historyIndex = -1;
+                
+                // Display command
+                this.addOutput(`<span class="command-prompt">${this.prompt.textContent}</span><span class="command-text">${command}</span>`);
+                
+                // Clear input
+                this.input.value = '';
+                
+                // Show loading state
+                this.input.classList.add('loading');
+                
+                try {
+                    const response = await fetch('/execute', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ command: command })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    // Update prompt if directory changed
+                    if (result.prompt) {
+                        this.prompt.textContent = result.prompt;
+                    }
+                    
+                    // Display output
+                    if (result.output) {
+                        if (result.output === 'CLEAR_SCREEN') {
+                            this.clearScreen();
+                        } else {
+                            this.addOutput(`<span class="output-text">${this.escapeHtml(result.output)}</span>`);
+                        }
+                    }
+                    
+                    // Display errors
+                    if (result.error) {
+                        this.addOutput(`<span class="error-text">Error: ${this.escapeHtml(result.error)}</span>`);
+                    }
+                    
+                } catch (error) {
+                    this.addOutput(`<span class="error-text">Connection error: ${error.message}</span>`);
+                } finally {
+                    this.input.classList.remove('loading');
+                    this.focusInput();
+                }
+            }
+            
+            addOutput(content) {
+                const line = document.createElement('div');
+                line.className = 'command-line';
+                line.innerHTML = content;
+                this.output.appendChild(line);
+                this.scrollToBottom();
+            }
+            
+            navigateHistory(direction) {
+                if (this.commandHistory.length === 0) return;
+                
+                if (direction === 'up') {
+                    if (this.historyIndex < this.commandHistory.length - 1) {
+                        this.historyIndex++;
+                    }
+                } else if (direction === 'down') {
+                    if (this.historyIndex > 0) {
+                        this.historyIndex--;
+                    } else {
+                        this.historyIndex = -1;
+                        this.input.value = '';
+                        return;
+                    }
+                }
+                
+                this.input.value = this.commandHistory[this.historyIndex] || '';
+                
+                // Move cursor to end
+                setTimeout(() => {
+                    this.input.setSelectionRange(this.input.value.length, this.input.value.length);
+                }, 0);
+            }
+            
+            clearScreen() {
+                this.output.innerHTML = '';
+                this.addOutput('<span class="output-text">Terminal cleared</span>');
+            }
+            
+            interruptCommand() {
+                this.addOutput('<span class="error-text">^C</span>');
+                this.input.value = '';
+            }
+            
+            scrollToBottom() {
+                this.output.scrollTop = this.output.scrollHeight;
+            }
+            
+            focusInput() {
+                this.input.focus();
+            }
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML.replace(/\n/g, '<br>').replace(/\s/g, '&nbsp;');
+            }
+            
+            async loadSystemInfo() {
+                try {
+                    const response = await fetch('/system_info');
+                    const data = await response.json();
+                    
+                    const systemInfoContent = document.getElementById('systemInfoContent');
+                    systemInfoContent.innerHTML = `
+                        <strong>System:</strong> ${data.system.platform}<br>
+                        <strong>CPU:</strong> ${data.cpu.total_cpu_usage}%<br>
+                        <strong>Memory:</strong> ${data.memory.memory_percentage}%<br>
+                        <strong>Cores:</strong> ${data.cpu.total_cores}<br>
+                    `;
+                } catch (error) {
+                    console.error('Failed to load system info:', error);
+                }
+            }
+        }
+        
+        // Terminal control functions
+        function closeTerminal() {
+            if (confirm('Are you sure you want to close the terminal?')) {
+                window.close();
+            }
+        }
+        
+        function minimizeTerminal() {
+            // Web browsers don't allow window minimization for security reasons
+            alert('Minimize not available in web interface');
+        }
+        
+        function maximizeTerminal() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                document.documentElement.requestFullscreen();
+            }
+        }
+        
+        function toggleSystemInfo() {
+            const systemInfo = document.getElementById('systemInfo');
+            const button = document.querySelector('.toggle-info');
+            
+            if (systemInfo.style.display === 'block') {
+                systemInfo.style.display = 'none';
+                button.textContent = 'System Info';
+            } else {
+                systemInfo.style.display = 'block';
+                button.textContent = 'Hide Info';
+                terminal.loadSystemInfo(); // Refresh data
+            }
+        }
+        
+        // Initialize terminal when page loads
+        let terminal;
+        window.addEventListener('DOMContentLoaded', () => {
+            terminal = new WebTerminal();
+        });
+        
+        // Prevent context menu in terminal area
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.closest('.terminal-container')) {
+                e.preventDefault();
+            }
+        });
+        
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                terminal.focusInput();
+            }
+        });
+    </script>
+</body>
+</html>
