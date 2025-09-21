@@ -95,11 +95,11 @@ Examples:
     parser.add_argument('--ai', action='store_true',
                        help='Enable AI natural language processing')
     
-    parser.add_argument('--host', default='localhost',
-                       help='Host for web interface (default: localhost)')
+    parser.add_argument('--host', default='0.0.0.0',
+                       help='Host for web interface (default: 0.0.0.0 for deployment)')
     
-    parser.add_argument('--port', type=int, default=5000,
-                       help='Port for web interface (default: 5000)')
+    parser.add_argument('--port', type=int, default=int(os.environ.get("PORT", 5000)),
+                       help='Port for web interface (default: $PORT env or 5000)')
     
     parser.add_argument('--debug', action='store_true',
                        help='Enable debug mode')
