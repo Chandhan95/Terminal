@@ -242,28 +242,13 @@ ask "backup system configuration files"
 - **AI-human collaboration** - Learns from user patterns
 - **Zero-config deployment** - Works out of the box
 
-### 🚀 Technical Excellence
-- **Clean architecture** - Modular, extensible codebase
-- **Comprehensive testing** - Unit tests, integration tests, AI validation
-- **Performance optimized** - Sub-100ms command execution
-- **Security focused** - Input validation, command sandboxing
-
-### 👥 User Impact
+### 👥 🚀 User Impact
 - **Beginner friendly** - Natural language removes learning curve
 - **Expert efficient** - Reduces repetitive typing by 60%
 - **Educational** - Shows generated commands for learning
 - **Accessible** - Works on any device with a browser
 
----
 
-## 📊 Benchmarks
-
-| Metric | Traditional Terminal | Our AI Terminal | Improvement |
-|--------|---------------------|----------------|-------------|
-| Time to execute complex operations | 45 seconds | 12 seconds | **73% faster** |
-| Learning curve for beginners | 2-3 weeks | 30 minutes | **99% reduction** |
-| Command recall accuracy | 40% | 95% | **138% better** |
-| Error rate reduction | baseline | -80% | **5x fewer errors** |
 
 ---
 
@@ -289,7 +274,7 @@ Output: Formatted results with human-readable explanations
 ```yaml
 Frontend:
   - Vanilla JavaScript (no frameworks for speed)
-  - WebSocket for real-time communication
+  - HTML
   - CSS Grid for responsive layout
   - Chart.js for system monitoring graphs
 
@@ -323,11 +308,6 @@ Docker: Container-optimized paths
 - **AI pair programming** - Real-time code suggestions
 - **Knowledge sharing** - Community command patterns
 
-### Phase 4: Enterprise
-- **Security compliance** - SOC2, GDPR ready
-- **Integration APIs** - Slack, Discord, Teams
-- **Analytics dashboard** - Usage patterns, efficiency metrics
-
 ---
 
 ## 🏃‍♂️ Quick Start Guide
@@ -351,12 +331,6 @@ python main.py --test
 python main.py --ai --web
 
 # 4. Open browser to http://localhost:5000
-```
-
-### Docker Deployment
-```bash
-docker build -t ai-terminal .
-docker run -p 5000:5000 ai-terminal --web --ai
 ```
 
 ---
@@ -384,61 +358,6 @@ ask "backup everything important to the cloud"
 
 ---
 
-## 🏅 Competitive Advantages
-
-| Feature | Existing Tools | Our Solution |
-|---------|----------------|--------------|
-| **Learning Curve** | Steep, requires memorization | Natural language, instant |
-| **Error Recovery** | Cryptic error messages | AI-powered suggestions |
-| **Accessibility** | Command-line only | Web + CLI + mobile |
-| **Automation** | Requires scripting knowledge | Plain English instructions |
-| **Monitoring** | Separate tools needed | Built-in real-time dashboard |
-
----
-
-## 🤝 Contributing & Team
-
-### Development Team Roles
-- **AI/ML Engineer** - NLP model development
-- **Backend Developer** - Terminal core and APIs  
-- **Frontend Developer** - Web interface and UX
-- **DevOps Engineer** - Deployment and scalability
-
-### Contributing Guidelines
-```bash
-# 1. Fork and clone
-git clone https://github.com/yourusername/python-terminal.git
-
-# 2. Create feature branch
-git checkout -b feature/amazing-new-feature
-
-# 3. Make changes and test
-python main.py --test
-python main.py --ai --debug
-
-# 4. Submit pull request with demo
-```
-
----
-
-## 📈 Success Metrics
-
-### User Adoption
-- **Target**: 10,000+ GitHub stars in first month
-- **Measure**: Downloads, active users, community contributions
-
-### Technical Performance  
-- **Response time**: <100ms for AI processing
-- **Accuracy**: >95% successful command interpretation
-- **Uptime**: 99.9% web interface availability
-
-### Innovation Recognition
-- **Hackathon placement**: Top 3 finish
-- **Community impact**: Featured in tech publications
-- **Industry adoption**: Enterprise pilot programs
-
----
-
 ## 🎉 Get Started Now!
 
 ```bash
@@ -446,13 +365,14 @@ python main.py --ai --debug
 git clone https://github.com/yourusername/python-terminal.git
 cd python-terminal && pip install -r requirements.txt
 python main.py --ai --web
-# Open http://localhost:5000 and ask: "show me what this terminal can do"
+# Open http://localhost:5000 and ask: "ai_help"
 ```
 
 **Ready to revolutionize how humans interact with computers?**
 
-[🚀 **Try Live Demo**](https://your-demo-link.com) | [📖 **Documentation**](https://docs.your-project.com) | [💬 **Join Discord**](https://discord.gg/your-server)
+[🚀 **Try Live Demo**](https://terminalp.onrender.com) | [💬 **Email-me**](https://saichandhan95155@gmail.com)
+
 
 ---
 
-*Built with ❤️ during [Hackathon Name] | MIT Licensed | Star us on GitHub!*
+*Built with ❤️ during CodeMate AI Hackathon  | Star us on GitHub!*
